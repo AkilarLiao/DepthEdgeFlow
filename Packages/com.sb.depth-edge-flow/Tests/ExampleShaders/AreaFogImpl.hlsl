@@ -6,7 +6,7 @@
 #ifndef AREA_FOG_IMPL_INCLUDED
 #define AREA_FOG_IMPL_INCLUDED
 #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
-#include "Packages/com.sb.soft-edge-flow/Shaders/SoftEdgeFlow.hlsl"
+#include "Packages/com.sb.depth-edge-flow/Shaders/SoftEdgeFlow.hlsl"
             
 struct VertexInput
 {
