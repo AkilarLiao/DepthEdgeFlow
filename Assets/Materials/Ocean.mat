@@ -1,0 +1,44 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Ocean
+  m_Shader: {fileID: 4800000, guid: 6757481c85b98d643a3afee3d533b013, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords: []
+  m_InvalidKeywords: []
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_LockedProperties: 
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _NormalMap:
+        m_Texture: {fileID: 2800000, guid: 1262ae24983b5784a8d53da73bd0cc42, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Ints: []
+    m_Floats:
+    - _Depth: 0.15
+    - _DepthPow: 2
+    - _OffestHeight: 0.4
+    - _PerlinNoiseSpeed: 0.2
+    - _PerlinRnageRatio: 20
+    - _PerlinWorldScale: 0.7
+    - _RefractionDistortion: 0.25
+    m_Colors:
+    - _Color: {r: 0.3160377, g: 1, b: 0.97349095, a: 1}
+    - _DeepColor: {r: 0.4292453, g: 0.7019834, b: 1, a: 1}
+    - _ShallowColor: {r: 0.75521344, g: 1, b: 0.6367924, a: 1}
+  m_BuildTextureStacks: []
+  m_AllowLocking: 1
