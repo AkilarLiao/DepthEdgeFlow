@@ -1,0 +1,21 @@
+{
+    "name": "com.sb.depth-edge-flow",
+    "description": "It’s a lightweight technique that reconstructs world position from depth, adds noise-based height perturbation, and uses the result to drive soft alpha transitions near surfaces—creating the illusion of flowing edges without geometry deformation.",
+    "version": "1.0.0",
+    "unity": "6000.0",
+    "displayName": "DepthEdgeFlow",
+    "dependencies": {
+        "com.unity.render-pipelines.universal": "17.0.3"
+    },
+	"keywords": [
+		"Graphics",
+		"DepthInverse",
+		"DepthEdgeFlow",
+		"URP"
+	],
+	"author": {
+		"name": "SmallBurger Technologies",
+		"email": "smallburger6696@gmail.com",
+		"url": "https://mysmallburger.blogspot.com/"
+	}
+}

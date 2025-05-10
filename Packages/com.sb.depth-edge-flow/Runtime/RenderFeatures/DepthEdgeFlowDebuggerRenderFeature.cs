@@ -8,10 +8,10 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 
-namespace SB.SoftEdgeFlow
+namespace SB.DepthEdgeFlow
 {
-    [DisallowMultipleRendererFeature("SoftEdgeFlowDebuggerRenderFeature")]
-    public class SoftEdgeFlowDebuggerRenderFeature : ScriptableRendererFeature
+    [DisallowMultipleRendererFeature("DepthEdgeFlowDebuggerRenderFeature")]
+    public class DepthEdgeFlowDebuggerRenderFeature : ScriptableRendererFeature
     {
         public override void Create()
         {
@@ -32,16 +32,16 @@ namespace SB.SoftEdgeFlow
 #if UNITY_EDITOR
         private void OnBeginContextRendering(ScriptableRenderContext context, List<Camera> cameras)
         {
-            if (m_viewSoftEdgeFlowWeight)
-                Shader.EnableKeyword(c_viewSoftEdgeFlowKeyword);
+            if (m_viewDepthEdgeFlowWeight)
+                Shader.EnableKeyword(c_viewDepthEdgeFlowKeyword);
             else
-                Shader.DisableKeyword(c_viewSoftEdgeFlowKeyword);
+                Shader.DisableKeyword(c_viewDepthEdgeFlowKeyword);
         }
 
         [Tooltip("The view edge flow weight flag.")]
-        public bool m_viewSoftEdgeFlowWeight = false;
+        public bool m_viewDepthEdgeFlowWeight = false;
         
-        private const string c_viewSoftEdgeFlowKeyword = "VIEW_SOFT_EDGE_FLOW";
+        private const string c_viewDepthEdgeFlowKeyword = "VIEW_DEPTH_EDGE_FLOW";
 #endif //UNITY_EDITOR
     }
 }

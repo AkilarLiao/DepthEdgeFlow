@@ -1,5 +1,5 @@
 {
-    "name": "SB.SoftEdgeFlow.Runtime",
+    "name": "SB.DepthEdgeFlow.Runtime",
     "rootNamespace": "",
     "references": [
         "GUID:df380645f10b7bc4b97d4f5eb6303d95",
