@@ -19,7 +19,7 @@ Material:
   m_CustomRenderQueue: -1
   stringTagMap: {}
   disabledShaderPasses: []
-  m_LockedProperties: 
+  m_LockedProperties: _WaveXMovement
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
@@ -27,18 +27,28 @@ Material:
         m_Texture: {fileID: 2800000, guid: 1262ae24983b5784a8d53da73bd0cc42, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _WaveNormalMap:
+        m_Texture: {fileID: 2800000, guid: 1262ae24983b5784a8d53da73bd0cc42, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _Depth: 0.15
+    - _Depth: 1
     - _DepthPow: 2
-    - _OffestHeight: 0.4
+    - _OffestHeight: 0.25
     - _PerlinNoiseSpeed: 0.2
     - _PerlinRnageRatio: 20
     - _PerlinWorldScale: 0.7
     - _RefractionDistortion: 0.25
+    - _SubWaveMoveScale: 1
+    - _SubWaveWeight: 0.5
+    - _SubWaveWorldScale: 3
+    - _WaveWorldScale: 1
+    - _WaveXMovement: 0.2
+    - _WaveZMovement: 0.1
     m_Colors:
     - _Color: {r: 0.3160377, g: 1, b: 0.97349095, a: 1}
-    - _DeepColor: {r: 0.4292453, g: 0.7019834, b: 1, a: 1}
-    - _ShallowColor: {r: 0.75521344, g: 1, b: 0.6367924, a: 1}
+    - _DeepColor: {r: 0.024919916, g: 0.37482268, b: 0.754717, a: 1}
+    - _ShallowColor: {r: 0.1273585, g: 1, b: 0.44150934, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1

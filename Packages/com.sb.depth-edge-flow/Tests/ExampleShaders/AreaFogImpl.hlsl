@@ -6,7 +6,7 @@
 #ifndef AREA_FOG_IMPL_INCLUDED
 #define AREA_FOG_IMPL_INCLUDED
 #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
-#include "Packages/com.sb.depth-edge-flow/Shaders/SoftEdgeFlow.hlsl"
+#include "Packages/com.sb.depth-edge-flow/Shaders/DepthEdgeFlow.hlsl"
             
 struct VertexInput
 {
@@ -46,6 +46,9 @@ VertexOutput VertexProgram(VertexInput input)
 
 half4 FragmentProgram(VertexOutput input) : SV_Target
 {   
+    real3 normalWS = real3(0.0, 1.0, 0.0);
+
+
     half softEdgeFlowWeight = CalculateSoftEdgeFlowWeight(input.positionCS.xy, input.positionWS,
         float3(_Depth, _DepthPow, _OffestHeight),
         float3(_PerlinWorldScale, _PerlinNoiseSpeed, _PerlinRnageRatio));

@@ -5,9 +5,13 @@
 /// </summary>
 #ifndef OCEAN_IMPL_INCLUDED
 #define OCEAN_IMPL_INCLUDED
+
+#define _SPECULAR_COLOR
+
 #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
 #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/DeclareOpaqueTexture.hlsl"
-#include "Packages/com.sb.depth-edge-flow/Shaders/SoftEdgeFlow.hlsl"
+#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
+#include "Packages/com.sb.depth-edge-flow/Shaders/DepthEdgeFlow.hlsl"
             
 struct VertexInput
 {
@@ -16,12 +20,16 @@ struct VertexInput
 
 struct VertexOutput
 {
-    float3 positionWS : TEXCOORD0;
-    float4 positionSS : TEXCOORD1;
-    float4 positionCS : SV_POSITION;
+    float3 positionWS       : TEXCOORD0;
+    float4 waveNormalUVs    : TEXCOORD1;
+    float4 positionSS       : TEXCOORD2;
+    float4 positionCS       : SV_POSITION;
 };
 
-TEXTURE2D(_NormalMap); SAMPLER(sampler_NormalMap);
+static const real3x3 c_upPlaneMatrix = real3x3(real3(-1.0, 0.0, 0.0),
+	real3(0.0, 0.0, -1.0), real3(0.0, 1.0, 0.0));
+
+TEXTURE2D(_WaveNormalMap); SAMPLER(sampler_WaveNormalMap);
             
 CBUFFER_START(UnityPerMaterial)
 float _Depth;
@@ -32,8 +40,23 @@ half3 _DeepColor;
 float _PerlinWorldScale;
 float _PerlinNoiseSpeed;
 float _PerlinRnageRatio;
+float _WaveWorldScale;
+float _WaveXMovement;
+float _WaveZMovement;
+float _SubWaveWorldScale;
+half _SubWaveWeight;
 float _RefractionDistortion;
 CBUFFER_END
+
+float4 GetWaveNormalUV(in float2 positionWS2D)
+{
+    float2 waveMovement = frac(float2(_WaveXMovement, _WaveZMovement) * _Time.y);
+    float2 baseWorldUV = positionWS2D * _PerlinWorldScale;
+
+    return float4(
+        baseWorldUV * _WaveWorldScale + waveMovement,
+        baseWorldUV * _SubWaveWorldScale - waveMovement);
+}
 
 VertexOutput VertexProgram(VertexInput input)
 {
@@ -41,95 +64,92 @@ VertexOutput VertexProgram(VertexInput input)
     output.positionWS = TransformObjectToWorld(input.positionOS.xyz);
     output.positionCS = TransformWorldToHClip(output.positionWS);
     output.positionSS = ComputeScreenPos(output.positionCS);
+    output.waveNormalUVs = GetWaveNormalUV(output.positionWS.xz);
     return output;
 }
 
-//[Tooltip("The refraction distortion intensity")]
-//[Range(0.0f, 0.2f)]
-//public float m_refractionDistortion = 0.075f;
+real3 GetWaveNormal(in float4 waveNormalUVs, out half3 normalTS)
+{
+    half4 mainWaveNormalTS = SAMPLE_TEXTURE2D(_WaveNormalMap, sampler_WaveNormalMap,
+        waveNormalUVs.xy);
 
-//half3 GetRefractionColor(in real2 screenUV, in real3 normal, in float depthRatio,
-//    in float viewDistance, out half3 grabColor)
-//{
-//    float distortionFade = 1.0 - clamp(viewDistance * 0.01, 0.0001, 1.0);
-//    float3 distortion = normal * _RefractionDistortion * distortionFade * depthRatio;
-//
-//    grabColor = SAMPLE_TEXTURE2D(_CameraOpaqueTexture,
-//        sampler_CameraOpaqueTexture, screenUV + distortion.xz).rgb;
-//
-//    return lerp(grabColor * _AbsorptionTintValue.xyz * exp(
-//        ((-_AbsorptionParams.xyz * depthRatio) / _PlaneDepthParams.y) *
-//        _AbsorptionParams.w), grabColor, 1.0 - depthRatio);
-//}
+    half4 subWaveNormalTS = SAMPLE_TEXTURE2D(_WaveNormalMap, sampler_WaveNormalMap,
+        waveNormalUVs.zw);
 
-//void GetEnvironmentInformation(in float2 positionCS2, in float3 positionWS, in float4 positionSS,
-//    in real3 normalWS, out half depth, out half shadowMask, out Light mainLight,
-//    out half edgeFoamDepth, out half2 distortionScreenUV, out float3 groundPosition)
-//{
-//    real2 screenUV = positionSS.xy / positionSS.w;
-//    float depthDifference;
-//    depth = ProcessDepth(positionCS2, screenUV, positionWS.y, groundPosition, depthDifference);
-//
-//    distortionScreenUV = screenUV + _WorldParams.w * depth * normalWS.xz;
-//
-//    float distortionDepthDifference;
-//    half distortionDepth = ProcessDepth(positionCS2, distortionScreenUV, positionWS.y,
-//        groundPosition, distortionDepthDifference);
-//
-//    if (groundPosition.y <= positionWS.y)
-//    {
-//        depth = lerp(distortionDepth, depth, depth);
-//        depth = distortionDepth;
-//        depthDifference = distortionDepthDifference;
-//    }
-//
-//    edgeFoamDepth = saturate(depthDifference * _EdgeFoamWorldParams.x);
-//    edgeFoamDepth = 1.0 - saturate(pow(1.0 - edgeFoamDepth, 5));
-//
-//#ifdef _MAIN_LIGHT_SHADOWS
-//    float4 shadowCoord = TransformWorldToShadowCoord(positionWS);
-//#else
-//    float4 shadowCoord = float4(0, 0, 0, 0);
-//#endif
-//
-//    mainLight = GetMainLight(shadowCoord, positionWS, half4(1, 1, 1, 1));
-//    shadowMask = lerp(1.0, max(0.5, mainLight.distanceAttenuation * mainLight.shadowAttenuation),
-//        depth);
-//}
+    normalTS = UnpackNormal(lerp(mainWaveNormalTS, subWaveNormalTS, _SubWaveWeight));
 
-//void GetWaterSurfaceData(inout float3 positionWS, out real3 normalWS, out float distanceMask,
-//    out half3 normalTS)
-//{
-//    real3 waveNormal = real3(0, 1, 0);
-//#ifdef PROCESS_VALUE_NOISE
-//    float2 movement = _Time.y * _ValueNoiseParams.xy;
-//    float centerHeight = GetValueNoisePositionHeight(positionWS, movement);
-//    waveNormal = GetValueNoiseNormal(positionWS, movement, centerHeight, 1.0);
-//    positionWS.y += centerHeight;
-//#else
-//    float3 wavePositionWS;
-//    SampleWaves(positionWS.xz * _WorldParams.x, saturate((0.0 * 0.1 + 0.05)),
-//        _WaveControlParams.x, _WaveControlParams.y, _WaveControlParams.z, wavePositionWS, waveNormal);
-//    positionWS += wavePositionWS;
-//#endif
-//    distanceMask = saturate(exp(-_WorldParams.y * length(positionWS - _WorldSpaceCameraPos)));
-//    positionWS.y -= _DepthParams.z * distanceMask;
-//    normalWS = lerp(real3(0, 1, 0), waveNormal, pow(distanceMask, 2.5));
-//    normalWS.y *= _SmoothNormalFactor;
-//    ApplyNormalMap(positionWS, distanceMask, normalWS, normalTS);
-//}
-//NormalWS applya normal TS
+    return TransformTangentToWorld(normalTS, c_upPlaneMatrix);
+}
+
+void InitializeInputData(VertexOutput input, out InputData inputData, out half3 normalTS)
+{
+    inputData = (InputData)0;    
+    inputData.normalWS = GetWaveNormal(input.waveNormalUVs, normalTS);
+    inputData.positionWS = input.positionWS;
+    inputData.viewDirectionWS = SafeNormalize(GetWorldSpaceNormalizeViewDir(inputData.positionWS));
+    inputData.shadowCoord = float4(0, 0, 0, 0);
+    inputData.fogCoord = InitializeInputDataFog(float4(inputData.positionWS, 1.0), 0.0);
+    inputData.bakedGI = SampleSH(inputData.normalWS);
+    inputData.normalizedScreenSpaceUV = GetNormalizedScreenSpaceUV(input.positionCS);
+    //SampleSHPixel(shName, normalWSName)
+    //SampleSHPixel(shName, normalWSName)
+    /*
+#if defined(DYNAMICLIGHTMAP_ON)
+    inputData.bakedGI = SAMPLE_GI(input.staticLightmapUV, input.dynamicLightmapUV, input.vertexSH, inputData.normalWS);
+#else
+    inputData.bakedGI = SAMPLE_GI(input.staticLightmapUV, input.vertexSH, inputData.normalWS);
+#endif
+
+    inputData.normalizedScreenSpaceUV = GetNormalizedScreenSpaceUV(input.positionCS);
+    inputData.shadowMask = SAMPLE_SHADOWMASK(input.staticLightmapUV);
+
+    #if defined(DEBUG_DISPLAY)
+    #if defined(DYNAMICLIGHTMAP_ON)
+    inputData.dynamicLightmapUV = input.dynamicLightmapUV.xy;
+    #endif
+    #if defined(LIGHTMAP_ON)
+    inputData.staticLightmapUV = input.staticLightmapUV;
+    #else
+    inputData.vertexSH = input.vertexSH;
+    #endif
+    #endif
+    */
+}
+
 half4 FragmentProgram(VertexOutput input) : SV_Target
 {   
-    //real3 normalWS = real3(0.0, 1.0, 0.0);
+    //half4 UniversalFragmentBlinnPhong(InputData inputData, half3 diffuse,
+        //half4 specularGloss, half smoothness, half3 emission, half alpha, half3 normalTS)
+
+    InputData inputData;
+    half3 normalTS;
+    InitializeInputData(input, inputData, normalTS);
 
     half softEdgeFlowWeight = CalculateSoftEdgeFlowWeight(input.positionCS.xy, input.positionWS,
         float3(_Depth, _DepthPow, _OffestHeight),
         float3(_PerlinWorldScale, _PerlinNoiseSpeed, _PerlinRnageRatio));
 
-    half3 sceneColor = SampleSceneColor(input.positionSS.xy / input.positionSS.w);    
-    half3 destShallowColor = lerp(sceneColor, _ShallowColor, softEdgeFlowWeight);
-    return half4(lerp(destShallowColor, _DeepColor, softEdgeFlowWeight), 1.0);
+    half3 diffuse = lerp(_ShallowColor, _DeepColor, softEdgeFlowWeight);
+    half4 specularGloss = half4(1.0, 1.0, 1.0, 1.0);
+    half smoothness = 0.5;
+    half3 emission = half3(0, 0, 0);
+    half alpha = 1.0;
+
+    half3 lightResult = 
+        UniversalFragmentBlinnPhong(inputData, diffuse, specularGloss, smoothness, emission, 1.0, normalTS).rgb;
+
+
+    
+
+    //half3 destShallowColor = lerp(sceneColor, _ShallowColor, softEdgeFlowWeight * softEdgeFlowWeight);    
+    //return half4(lerp(destShallowColor, _DeepColor, softEdgeFlowWeight), 1.0);    
+
+
+    half2 distortionScreenUV = input.positionSS.xy / input.positionSS.w + 
+        _RefractionDistortion * softEdgeFlowWeight * inputData.normalWS.xz;
+    half3 sceneColor = SampleSceneColor(distortionScreenUV);
+    //return half4(diffuse, 1.0);
+    return half4(lerp(sceneColor, lightResult, softEdgeFlowWeight), 1.0);
 }
 
 #endif //OCEAN_IMPL_INCLUDED
