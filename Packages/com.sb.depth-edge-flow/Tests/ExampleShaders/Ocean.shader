@@ -18,8 +18,7 @@ Shader "SB/Ocean"
         _WaveWorldScale("WaveWorldScale", Range(0.01, 10.0)) = 1.0
         _WaveXMovement("WaveXMovement", Range(0.0, 10.0)) = 0.3
         _WaveZMovement("WaveZMovement", Range(0.0, 10.0)) = 0.3
-        _SubWaveWorldScale("SubWaveWorldScale", Range(0.01, 10.0)) = 1.0
-        //_SubWaveMoveScale("SubWaveMoveScale", Range(0.01, 1.0)) = 1.0
+        _SubWaveWorldScale("SubWaveWorldScale", Range(0.01, 10.0)) = 1.0        
         _SubWaveWeight("SubWaveWeight", Range(0.0, 1.0)) = 0.5
         _RefractionDistortion("RefractionDistortion", Range(0.0, 20.0)) = 0.25
         [NoScaleOffset] _WaveNormalMap("WaveNormalMap", 2D) = "bump" {}
@@ -39,5 +38,7 @@ Shader "SB/Ocean"
             #include "OceanImpl.hlsl"
             ENDHLSL
         }
+        UsePass "Universal Render Pipeline/Simple Lit/DepthOnly"
+        UsePass "Universal Render Pipeline/Simple Lit/DepthNormals"
     }
 }

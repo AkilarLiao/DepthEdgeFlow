@@ -22,7 +22,8 @@ namespace SB.DepthEdgeFlow
             RenderPipelineManager.beginContextRendering += OnBeginContextRendering;
 #endif //UNITY_EDITOR
         }
-        public override void AddRenderPasses(ScriptableRenderer renderer, ref RenderingData renderingData) { }
+        public override void AddRenderPasses(ScriptableRenderer renderer, 
+            ref RenderingData renderingData) { }
         protected override void Dispose(bool disposing)
         {
 #if UNITY_EDITOR

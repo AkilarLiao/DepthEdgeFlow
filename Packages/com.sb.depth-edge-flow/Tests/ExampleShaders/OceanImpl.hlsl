@@ -91,36 +91,10 @@ void InitializeInputData(VertexOutput input, out InputData inputData, out half3 
     inputData.fogCoord = InitializeInputDataFog(float4(inputData.positionWS, 1.0), 0.0);
     inputData.bakedGI = SampleSH(inputData.normalWS);
     inputData.normalizedScreenSpaceUV = GetNormalizedScreenSpaceUV(input.positionCS);
-    //SampleSHPixel(shName, normalWSName)
-    //SampleSHPixel(shName, normalWSName)
-    /*
-#if defined(DYNAMICLIGHTMAP_ON)
-    inputData.bakedGI = SAMPLE_GI(input.staticLightmapUV, input.dynamicLightmapUV, input.vertexSH, inputData.normalWS);
-#else
-    inputData.bakedGI = SAMPLE_GI(input.staticLightmapUV, input.vertexSH, inputData.normalWS);
-#endif
-
-    inputData.normalizedScreenSpaceUV = GetNormalizedScreenSpaceUV(input.positionCS);
-    inputData.shadowMask = SAMPLE_SHADOWMASK(input.staticLightmapUV);
-
-    #if defined(DEBUG_DISPLAY)
-    #if defined(DYNAMICLIGHTMAP_ON)
-    inputData.dynamicLightmapUV = input.dynamicLightmapUV.xy;
-    #endif
-    #if defined(LIGHTMAP_ON)
-    inputData.staticLightmapUV = input.staticLightmapUV;
-    #else
-    inputData.vertexSH = input.vertexSH;
-    #endif
-    #endif
-    */
 }
 
 half4 FragmentProgram(VertexOutput input) : SV_Target
 {   
-    //half4 UniversalFragmentBlinnPhong(InputData inputData, half3 diffuse,
-        //half4 specularGloss, half smoothness, half3 emission, half alpha, half3 normalTS)
-
     InputData inputData;
     half3 normalTS;
     InitializeInputData(input, inputData, normalTS);
@@ -135,20 +109,12 @@ half4 FragmentProgram(VertexOutput input) : SV_Target
     half3 emission = half3(0, 0, 0);
     half alpha = 1.0;
 
-    half3 lightResult = 
-        UniversalFragmentBlinnPhong(inputData, diffuse, specularGloss, smoothness, emission, 1.0, normalTS).rgb;
-
-
+    half3 lightResult = UniversalFragmentBlinnPhong(inputData, diffuse, 
+        specularGloss, smoothness, emission, 1.0, normalTS).rgb;
     
-
-    //half3 destShallowColor = lerp(sceneColor, _ShallowColor, softEdgeFlowWeight * softEdgeFlowWeight);    
-    //return half4(lerp(destShallowColor, _DeepColor, softEdgeFlowWeight), 1.0);    
-
-
     half2 distortionScreenUV = input.positionSS.xy / input.positionSS.w + 
         _RefractionDistortion * softEdgeFlowWeight * inputData.normalWS.xz;
     half3 sceneColor = SampleSceneColor(distortionScreenUV);
-    //return half4(diffuse, 1.0);
     return half4(lerp(sceneColor, lightResult, softEdgeFlowWeight), 1.0);
 }
 
