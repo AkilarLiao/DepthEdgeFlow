@@ -5,12 +5,23 @@
 
 ---
 
-**DepthEdgeFlow** is a lightweight, screen-space rendering technique  
-that simulates soft, dynamic edge effects — such as **shorelines**, **fog boundaries**, and **volumetric transitions** —  
-**without any geometry deformation or mesh subdivision**.
+## 🧠 What is DepthEdgeFlow?
 
-It reconstructs world position from scene depth, then applies **noise-driven height offset and flow simulation**  
-to create the illusion of natural motion at surface edges — perfect for **mobile and performance-constrained platforms**.
+**DepthEdgeFlow** is a screen-space rendering technique that simulates soft and dynamic edge effects (shorelines, fog, cloudbanks)  
+without relying on geometry deformation, vertex displacement, or raymarching.
+
+It reconstructs world position from scene depth, then uses height offsets and noise modulation to alter transparency, distortion, or visibility —  
+all in fragment shader.
+
+---
+
+## 💡 Core Idea
+
+At the core, DepthEdgeFlow combines:
+
+1. **Depth Texture → World Space** reconstruction  
+2. **Noise-modulated height offsets**  
+3. **Pixel-wise alpha / distortion / masking**
 
 ---
 
@@ -19,6 +30,7 @@ to create the illusion of natural motion at surface edges — perfect for **mobi
 - Mobile-ready: optimized for low-end devices
 - Easy to integrate into existing URP pipelines
 ---
+
 ### 🧪 Example Use Cases
 - 🌊 Shoreline flow without water mesh deformation  
 - ☁️ Fog, gas, or cloudbank edges with soft dynamic motion  
