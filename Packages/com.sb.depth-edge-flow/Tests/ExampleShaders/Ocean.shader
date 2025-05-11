@@ -27,6 +27,7 @@ Shader "SB/Ocean"
     {
         Tags 
         {  
+           "LightMode" = "UniversalForward"
            "Queue" = "Transparent-1"
         }
         Pass
@@ -34,7 +35,7 @@ Shader "SB/Ocean"
             HLSLPROGRAM
             #pragma vertex VertexProgram
             #pragma fragment FragmentProgram
-            #pragma multi_compile _ _ADDITIONAL_LIGHTS_VERTEX _ADDITIONAL_LIGHTS
+            #pragma multi_compile _ _FORWARD_PLUS
             #include "OceanImpl.hlsl"
             ENDHLSL
         }
