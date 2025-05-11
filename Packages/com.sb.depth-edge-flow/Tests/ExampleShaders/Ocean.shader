@@ -34,7 +34,7 @@ Shader "SB/Ocean"
             HLSLPROGRAM
             #pragma vertex VertexProgram
             #pragma fragment FragmentProgram
-            #pragma multi_compile_fog
+            #pragma multi_compile _ _ADDITIONAL_LIGHTS_VERTEX _ADDITIONAL_LIGHTS
             #include "OceanImpl.hlsl"
             ENDHLSL
         }

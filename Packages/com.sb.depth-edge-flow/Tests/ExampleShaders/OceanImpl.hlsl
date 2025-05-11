@@ -7,6 +7,7 @@
 #define OCEAN_IMPL_INCLUDED
 
 #define _SPECULAR_COLOR
+//#define _FOG_FRAGMENT
 
 #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
 #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/DeclareOpaqueTexture.hlsl"
@@ -88,7 +89,9 @@ void InitializeInputData(VertexOutput input, out InputData inputData, out half3 
     inputData.positionWS = input.positionWS;
     inputData.viewDirectionWS = SafeNormalize(GetWorldSpaceNormalizeViewDir(inputData.positionWS));
     inputData.shadowCoord = float4(0, 0, 0, 0);
-    inputData.fogCoord = InitializeInputDataFog(float4(inputData.positionWS, 1.0), 0.0);
+
+    inputData.fogCoord = InitializeInputDataFog(
+        float4(inputData.positionWS, 1.0), 0);
     inputData.bakedGI = SampleSH(inputData.normalWS);
     inputData.normalizedScreenSpaceUV = GetNormalizedScreenSpaceUV(input.positionCS);
 }
