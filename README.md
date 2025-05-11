@@ -24,8 +24,9 @@ to create the illusion of natural motion at surface edges — perfect for **mobi
 - ☁️ Fog, gas, or cloudbank edges with soft dynamic motion  
 - 🔮 Screen-space "volumetric-lite" effects without raymarching  
 - 💡 Projected edge effects based on world height and noise
-  
-![Fog effect preview](Images/SampleScene.png)
+
+![Fog effect preview](Images/SeaAndMountainFog.png)
+![Sample scene](Images/SampleScene.png)
 
 ---
 ### 📸 Demo Video
