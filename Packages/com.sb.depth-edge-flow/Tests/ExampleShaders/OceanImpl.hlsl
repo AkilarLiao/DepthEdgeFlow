@@ -7,7 +7,6 @@
 #define OCEAN_IMPL_INCLUDED
 
 #define _SPECULAR_COLOR
-//#define _FOG_FRAGMENT
 
 #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
 #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/DeclareOpaqueTexture.hlsl"
@@ -24,6 +23,7 @@ struct VertexOutput
     float3 positionWS       : TEXCOORD0;
     float4 waveNormalUVs    : TEXCOORD1;
     float4 positionSS       : TEXCOORD2;
+    half  fogFactor         : TEXCOORD3;
     float4 positionCS       : SV_POSITION;
 };
 
@@ -66,6 +66,12 @@ VertexOutput VertexProgram(VertexInput input)
     output.positionCS = TransformWorldToHClip(output.positionWS);
     output.positionSS = ComputeScreenPos(output.positionCS);
     output.waveNormalUVs = GetWaveNormalUV(output.positionWS.xz);
+
+#if defined(_FOG_FRAGMENT)
+    output.fogFactor = 0;
+#else
+    output.fogFactor = ComputeFogFactor(output.positionCS.z);
+#endif
     return output;
 }
 
@@ -91,7 +97,7 @@ void InitializeInputData(VertexOutput input, out InputData inputData, out half3 
     inputData.shadowCoord = float4(0, 0, 0, 0);
 
     inputData.fogCoord = InitializeInputDataFog(
-        float4(inputData.positionWS, 1.0), 0);
+        float4(inputData.positionWS, 1.0), input.fogFactor);
     inputData.bakedGI = SampleSH(inputData.normalWS);
     inputData.normalizedScreenSpaceUV = GetNormalizedScreenSpaceUV(input.positionCS);
 }
@@ -114,6 +120,8 @@ half4 FragmentProgram(VertexOutput input) : SV_Target
 
     half3 lightResult = UniversalFragmentBlinnPhong(inputData, diffuse, 
         specularGloss, smoothness, emission, 1.0, normalTS).rgb;
+
+    lightResult = MixFog(lightResult, inputData.fogCoord);
     
     half2 distortionScreenUV = input.positionSS.xy / input.positionSS.w + 
         _RefractionDistortion * softEdgeFlowWeight * inputData.normalWS.xz;
